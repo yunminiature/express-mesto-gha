@@ -6,7 +6,7 @@ const getCards = (req, res) => {
       res.send({ data: cards })
     })
     .catch((err) => {
-      if(err.name == 'CastError'){
+      if((err.name == 'CastError') || (err.name == 'ValidationError')){
         res.status(400).send({ message: err.message });
       } else {
         res.status(500).send({ message: err.message })
@@ -20,7 +20,7 @@ const createCard = (req, res) => {
   Card.create({ name, link, owner: req.user._id })
     .then(card => res.send({ data: card }))
     .catch((err) => {
-      if(err.name == 'CastError'){
+      if((err.name == 'CastError') || (err.name == 'ValidationError')){
         res.status(400).send({ message: err.message });
       } else {
         res.status(500).send({ message: err.message })
@@ -37,7 +37,7 @@ const deleteCard = (req, res) => {
       res.send({ data: card })
     })
     .catch((err) => {
-      if(err.name == 'CastError'){
+      if((err.name == 'CastError') || (err.name == 'ValidationError')){
         res.status(400).send({ message: err.message });
       } else if (err.message === 'Not found'){
         res.status(404).send({message: 'Card not found'})
@@ -60,7 +60,7 @@ const likeCard = (req, res) => {
       res.send({ data: card })
     })
     .catch((err) => {
-      if(err.name == 'CastError'){
+      if((err.name == 'CastError') || (err.name == 'ValidationError')){
         res.status(400).send({ message: err.message });
       } else if (err.message === 'Not found'){
         res.status(404).send({message: 'Card not found'})
@@ -83,7 +83,7 @@ const dislikeCard = (req, res) => {
       res.send({ data: card })
     })
     .catch((err) => {
-      if(err.name == 'CastError'){
+      if((err.name == 'CastError') || (err.name == 'ValidationError')){
         res.status(400).send({ message: err.message });
       } else if (err.message === 'Not found'){
         res.status(404).send({message: 'Card not found'})
