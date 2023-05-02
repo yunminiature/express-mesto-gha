@@ -6,8 +6,12 @@ const getCards = (req, res) => {
       res.send({ data: cards })
     })
     .catch((err) => {
-      res.status(500).send({message: err.message})
-    })
+      if(err.name == 'CastError'){
+        res.status(400).send({ message: err.message });
+      } else {
+        res.status(500).send({ message: err.message })
+      }
+    });
 };
 
 const createCard = (req, res) => {
@@ -16,9 +20,8 @@ const createCard = (req, res) => {
   Card.create({ name, link, owner: req.user._id })
     .then(card => res.send({ data: card }))
     .catch((err) => {
-      if(err.name == 'ValidationError'){
-        const message = Object.values(err.errors).map(error => error.message).join('; ');
-        res.status(400).send({message: message});
+      if(err.name == 'CastError'){
+        res.status(400).send({ message: err.message });
       } else {
         res.status(500).send({ message: err.message })
       }
@@ -34,12 +37,14 @@ const deleteCard = (req, res) => {
       res.send({ data: card })
     })
     .catch((err) => {
-      if(err.message === 'Not found'){
+      if(err.name == 'CastError'){
+        res.status(400).send({ message: err.message });
+      } else if (err.message === 'Not found'){
         res.status(404).send({message: 'Card not found'})
       } else {
-        res.status(500).send({message: err.message})
+        res.status(500).send({ message: err.message })
       }
-    })
+    });
 }
 
 const likeCard = (req, res) => {
@@ -55,9 +60,8 @@ const likeCard = (req, res) => {
       res.send({ data: card })
     })
     .catch((err) => {
-      if(err.name == 'ValidationError'){
-        const message = Object.values(err.errors).map(error => error.message).join('; ');
-        res.status(400).send({message: message});
+      if(err.name == 'CastError'){
+        res.status(400).send({ message: err.message });
       } else if (err.message === 'Not found'){
         res.status(404).send({message: 'Card not found'})
       } else {
@@ -79,9 +83,8 @@ const dislikeCard = (req, res) => {
       res.send({ data: card })
     })
     .catch((err) => {
-      if(err.name == 'ValidationError'){
-        const message = Object.values(err.errors).map(error => error.message).join('; ');
-        res.status(400).send({message: message});
+      if(err.name == 'CastError'){
+        res.status(400).send({ message: err.message });
       } else if (err.message === 'Not found'){
         res.status(404).send({message: 'Card not found'})
       } else {
