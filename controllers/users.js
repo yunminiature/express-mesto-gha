@@ -23,10 +23,12 @@ const getUser = (req, res) => {
       res.send({ data: user })
     })
     .catch((err) => {
-      if(err.message === 'Not found'){
+      if((err.name == 'CastError') || (err.name == 'ValidationError')){
+        res.status(400).send({ message: err.message });
+      } else if (err.message === 'Not found'){
         res.status(404).send({message: 'User not found'})
       } else {
-        res.status(500).send({message: err.message})
+        res.status(500).send({ message: err.message })
       }
     })
 };
