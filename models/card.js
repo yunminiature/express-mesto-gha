@@ -5,26 +5,30 @@ const cardSchema = new mongoose.Schema({
     type: String,
     minlength: 2,
     maxlength: 30,
-    required: true
+    required: true,
   },
   link: {
     type: String,
-    required: true
+    required: true,
+    validate:{
+      validator: (value) => /([\w+]+\:\/\/)?([\w\d-]+\.)*[\w-]+[\.\:]\w+([\/\?\=\&\#\.]?[\w-]+)*\/?/gm.test(value),
+      message: 'Некорректный URL',
+    },
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
-    required: true
+    ref: 'user',
+    required: true,
   },
-  likes:[{ 
+  likes: [{
     type: mongoose.Schema.Types.ObjectId,
-    minlength: 2,
-    maxlength: 30,
-    default: ''
+    ref: 'user',
+    default: [],
   }],
   createdAt: {
     type: Date,
-    default: Date.now
-  }
-});
+    default: Date.now,
+  },
+}, { versionKey: false });
 
 module.exports = mongoose.model('card', cardSchema);

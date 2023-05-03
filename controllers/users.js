@@ -3,14 +3,10 @@ const User = require('../models/user');
 const getUsers = (req, res) => {
   User.find({})
     .then((users) => {
-      res.send({ data: users })
+      res.send({ data: users });
     })
     .catch((err) => {
-      if((err.name == 'CastError') || (err.name == 'ValidationError')){
-        res.status(400).send({ message: err.message });
-      } else {
-        res.status(500).send({ message: err.message })
-      }
+      res.status(500).send({ message: err.message });
     });
 };
 
@@ -20,17 +16,17 @@ const getUser = (req, res) => {
       throw new Error('Not found');
     })
     .then((user) => {
-      res.send({ data: user })
+      res.send({ data: user });
     })
     .catch((err) => {
-      if((err.name == 'CastError') || (err.name == 'ValidationError')){
+      if ((err.name === 'CastError') || (err.name === 'ValidationError')) {
         res.status(400).send({ message: err.message });
-      } else if (err.message === 'Not found'){
-        res.status(404).send({message: 'User not found'})
+      } else if (err.message === 'Not found') {
+        res.status(404).send({ message: 'User not found' });
       } else {
-        res.status(500).send({ message: err.message })
+        res.status(500).send({ message: err.message });
       }
-    })
+    });
 };
 
 const createUser = (req, res) => {
@@ -38,13 +34,13 @@ const createUser = (req, res) => {
 
   User.create({ name, about, avatar })
     .then((user) => {
-      res.send({ data: user })
+      res.status(201).send({ data: user });
     })
     .catch((err) => {
-      if((err.name == 'CastError') || (err.name == 'ValidationError')){
+      if (err.name === 'ValidationError') {
         res.status(400).send({ message: err.message });
       } else {
-        res.status(500).send({ message: err.message })
+        res.status(500).send({ message: err.message });
       }
     });
 };
@@ -57,23 +53,22 @@ const updateUser = (req, res) => {
     {
       new: true,
       runValidators: true,
-      upsert: true
-    }
+    },
   )
     .orFail(() => {
       throw new Error('Not found');
     })
-    .then(user => res.send({ data: user }))
+    .then((user) => res.send({ data: user }))
     .catch((err) => {
-      if((err.name == 'CastError') || (err.name == 'ValidationError')){
+      if ((err.name === 'CastError') || (err.name === 'ValidationError')) {
         res.status(400).send({ message: err.message });
-      } else if (err.message === 'Not found'){
-        res.status(404).send({message: 'User not found'})
+      } else if (err.message === 'Not found') {
+        res.status(404).send({ message: 'User not found' });
       } else {
-        res.status(500).send({ message: err.message })
+        res.status(500).send({ message: err.message });
       }
     });
-}
+};
 
 const updateAvatar = (req, res) => {
   const { avatar } = req.body;
@@ -83,29 +78,27 @@ const updateAvatar = (req, res) => {
     {
       new: true,
       runValidators: true,
-      upsert: true
-    }
+    },
   )
     .orFail(() => {
       throw new Error('Not found');
     })
-    .then(user => res.send({ data: user }))
+    .then((user) => res.send({ data: user }))
     .catch((err) => {
-      if((err.name == 'CastError') || (err.name == 'ValidationError')){
+      if ((err.name === 'CastError') || (err.name === 'ValidationError')) {
         res.status(400).send({ message: err.message });
-      } else if(err.message === 'Not found'){
-        res.status(404).send({message: 'User not found'})
+      } else if (err.message === 'Not found') {
+        res.status(404).send({ message: 'User not found' });
       } else {
-        res.status(500).send({ message: err.message })
+        res.status(500).send({ message: err.message });
       }
     });
-}
-
+};
 
 module.exports = {
   getUsers,
   getUser,
   createUser,
   updateUser,
-  updateAvatar
-}
+  updateAvatar,
+};
