@@ -70,7 +70,14 @@ const createUser = (req, res) => {
       });
     })
     .then((user) => {
-      res.status(201).send({ data: user });
+      res.status(201).send({
+        data: {
+          email,
+          name,
+          about,
+          avatar,
+        },
+      });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {

@@ -1,11 +1,25 @@
 const express = require('express');
-const { getCards, createCard, deleteCard, likeCard, dislikeCard } = require('../controllers/cards');
+const { celebrate, Joi } = require('celebrate');
+const {
+  getCards,
+  createCard,
+  deleteCard,
+  likeCard,
+  dislikeCard,
+} = require('../controllers/cards');
+const auth = require('../middlewares/auth');
+
 const cardRouter = express.Router();
 
-cardRouter.get('/cards', getCards);
-cardRouter.post('/cards', createCard);
-cardRouter.delete('/cards/:cardId', deleteCard);
-cardRouter.put('/cards/:cardId/likes', likeCard);
-cardRouter.delete('/cards/:cardId/likes', dislikeCard);
+cardRouter.get('/cards', auth, getCards);
+cardRouter.post('/cards', auth, celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().min(2).max(30).required(),
+    link: Joi.string().regex(/(http|ftp|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\/~+#-]*[\w@?^=%&\/~+#-])/gmi).required(),
+  }),
+}), createCard);
+cardRouter.delete('/cards/:cardId', auth, deleteCard);
+cardRouter.put('/cards/:cardId/likes', auth, likeCard);
+cardRouter.delete('/cards/:cardId/likes', auth, dislikeCard);
 
 module.exports = cardRouter;
