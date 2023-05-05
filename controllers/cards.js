@@ -25,7 +25,7 @@ const createCard = (req, res) => {
 };
 
 const deleteCard = (req, res) => {
-  Card.findByIdAndRemove(req.params.cardId)
+  Card.findOneAndRemove({ _id: req.params.cardId, owner: req.user._id })
     .orFail(() => {
       throw new Error('Not found');
     })
