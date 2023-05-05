@@ -12,8 +12,8 @@ const auth = require('../middlewares/auth');
 const userRouter = express.Router();
 
 userRouter.get('/users', auth, getUsers);
-userRouter.get('/users/:userId', auth, getUser);
 userRouter.get('/users/me', auth, getUserMe);
+userRouter.get('/users/:userId', auth, getUser);
 userRouter.patch('/users/me', auth, celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30).required(),
