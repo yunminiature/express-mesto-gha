@@ -1,54 +1,57 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+const NotFoundError = require('../errors/not-found-err');
+const DataError = require('../errors/data-err');
+const IncorrectCredError = require('../errors/incorrect-cred');
 
-const getUsers = (req, res) => {
+const getUsers = (req, res, next) => {
   User.find({})
     .then((users) => {
       res.send({ data: users });
     })
     .catch((err) => {
-      res.status(500).send({ message: err.message });
+      next(err);
     });
 };
 
-const getUser = (req, res) => {
+const getUser = (req, res, next) => {
   User.findById(req.params.userId)
     .orFail(() => {
-      throw new Error('Not found');
+      next(new NotFoundError('User not found'));
     })
     .then((user) => {
       res.send({ data: user });
     })
     .catch((err) => {
-      if ((err.name === 'CastError') || (err.name === 'ValidationError')) {
-        res.status(400).send({ message: err.message });
+      if (err.name === 'CastError') {
+        next(new DataError());
       } else if (err.message === 'Not found') {
-        res.status(404).send({ message: 'User not found' });
+        next(new NotFoundError('User not found'));
       } else {
-        res.status(500).send({ message: err.message });
+        next(err);
       }
     });
 };
 
-const getUserMe = (req, res) => {
+const getUserMe = (req, res, next) => {
   User.findById(req.user._id)
     .orFail(() => {
-      throw new Error('Not found');
+      next(new NotFoundError('User not found'));
     })
     .then((user) => {
       res.send({ data: user });
     })
     .catch((err) => {
       if (err.message === 'Not found') {
-        res.status(404).send({ message: 'User not found' });
+        next(new NotFoundError('User not found'));
       } else {
-        res.status(500).send({ message: err.message });
+        next(err);
       }
     });
 };
 
-const createUser = (req, res) => {
+const createUser = (req, res, next) => {
   const {
     email,
     password,
@@ -74,16 +77,16 @@ const createUser = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: err.message });
+        next(new DataError());
       } else if (err.code === 11000) {
         res.status(409).send({ message: err.message });
       } else {
-        res.status(500).send({ message: err.message });
+        next(err);
       }
     });
 };
 
-const updateUser = (req, res) => {
+const updateUser = (req, res, next) => {
   const { name, about } = req.body;
   User.findByIdAndUpdate(
     req.user._id,
@@ -94,19 +97,19 @@ const updateUser = (req, res) => {
     },
   )
     .orFail(() => {
-      throw new Error('Not found');
+      next(new NotFoundError('User not found'));
     })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.message === 'Not found') {
-        res.status(404).send({ message: 'User not found' });
+        next(new NotFoundError('User not found'));
       } else {
-        res.status(500).send({ message: err.message });
+        next(err);
       }
     });
 };
 
-const updateAvatar = (req, res) => {
+const updateAvatar = (req, res, next) => {
   const { avatar } = req.body;
   User.findByIdAndUpdate(
     req.user._id,
@@ -117,19 +120,19 @@ const updateAvatar = (req, res) => {
     },
   )
     .orFail(() => {
-      throw new Error('Not found');
+      next(new NotFoundError('User not found'));
     })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.message === 'Not found') {
-        res.status(404).send({ message: 'User not found' });
+        next(new NotFoundError('User not found'));
       } else {
-        res.status(500).send({ message: err.message });
+        next(err);
       }
     });
 };
 
-const login = (req, res) => {
+const login = (req, res, next) => {
   const { email, password } = req.body;
 
   return User.findUserByCredentials(email, password)
@@ -138,7 +141,7 @@ const login = (req, res) => {
       res.send({ token });
     })
     .catch((err) => {
-      res.status(401).send({ message: err.message });
+      next(new IncorrectCredError());
     });
 };
 

@@ -18,7 +18,11 @@ cardRouter.post('', auth, celebrate({
     link: Joi.string().regex(/(http|ftp|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\/~+#-]*[\w@?^=%&\/~+#-])/mi).required(),
   }),
 }), createCard);
-cardRouter.delete('/:cardId', auth, deleteCard);
+cardRouter.delete('/:cardId', auth, celebrate({
+  params: Joi.object().keys({
+    cardId: Joi.string().alphanum(),
+  }),
+}), deleteCard);
 cardRouter.put('/:cardId/likes', auth, celebrate({
   params: Joi.object().keys({
     cardId: Joi.string().alphanum(),

@@ -35,8 +35,8 @@ app.post('/signin', celebrate({
 
 app.use('/users', userRouter);
 app.use('/cards', cardRouter);
-app.use('*', (req, res) => {
-  throw new NotFoundError('Page not found');
+app.use('*', (req, res, next) => {
+  next(new NotFoundError());
 });
 app.use(errors());
 app.use((err, req, res) => {
