@@ -1,6 +1,5 @@
 const express = require('express');
 const { celebrate, Joi } = require('celebrate');
-const { linkRegex } = require('../app');
 const {
   getCards,
   createCard,
@@ -16,7 +15,7 @@ cardRouter.get('', auth, getCards);
 cardRouter.post('', auth, celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30).required(),
-    link: Joi.string().regex(linkRegex).required(),
+    link: Joi.string().regex(/(http|ftp|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\/~+#-]*[\w@?^=%&\/~+#-])/mi).required(),
   }),
 }), createCard);
 cardRouter.delete('/:cardId', auth, deleteCard);

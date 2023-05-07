@@ -1,6 +1,5 @@
 const express = require('express');
 const { celebrate, Joi } = require('celebrate');
-const { linkRegex } = require('../app');
 const {
   getUsers,
   getUser,
@@ -27,7 +26,7 @@ userRouter.patch('/me', auth, celebrate({
 }), updateUser);
 userRouter.patch('/me/avatar', auth, celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().regex(linkRegex).required(),
+    avatar: Joi.string().regex(/(http|ftp|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\/~+#-]*[\w@?^=%&\/~+#-])/mi).required(),
   }),
 }), updateAvatar);
 
