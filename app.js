@@ -5,9 +5,12 @@ const { celebrate, Joi, errors } = require('celebrate');
 
 const app = express();
 const { PORT = 3000 } = process.env;
+const NotFoundError = require('./errors/not-found-err');
 const userRouter = require('./routes/users');
 const cardRouter = require('./routes/cards');
 const { createUser, login } = require('./controllers/users');
+
+const linkRegex = /(http|ftp|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\/~+#-]*[\w@?^=%&\/~+#-])/mi;
 
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
 
@@ -20,7 +23,7 @@ app.post('/signup', celebrate({
     password: Joi.string().required().min(2),
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
-    avatar: Joi.string().regex(/(http|ftp|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\/~+#-]*[\w@?^=%&\/~+#-])/mi),
+    avatar: Joi.string().regex(linkRegex),
   }),
 }), createUser);
 app.post('/signin', celebrate({
@@ -30,10 +33,10 @@ app.post('/signin', celebrate({
   }),
 }), login);
 
-app.use(userRouter);
-app.use(cardRouter);
+app.use('/users', userRouter);
+app.use('/cards', cardRouter);
 app.use('*', (req, res) => {
-  res.status(404).send({ message: 'Page not found' });
+  throw new NotFoundError('Page not found');
 });
 app.use(errors());
 app.use((err, req, res) => {
@@ -47,3 +50,4 @@ app.use((err, req, res) => {
 });
 
 app.listen(PORT);
+module.exports = { linkRegex };

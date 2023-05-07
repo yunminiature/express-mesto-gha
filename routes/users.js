@@ -1,5 +1,6 @@
 const express = require('express');
 const { celebrate, Joi } = require('celebrate');
+const { linkRegex } = require('../app');
 const {
   getUsers,
   getUser,
@@ -11,18 +12,22 @@ const auth = require('../middlewares/auth');
 
 const userRouter = express.Router();
 
-userRouter.get('/users', auth, getUsers);
-userRouter.get('/users/me', auth, getUserMe);
-userRouter.get('/users/:userId', auth, getUser);
-userRouter.patch('/users/me', auth, celebrate({
+userRouter.get('', auth, getUsers);
+userRouter.get('/me', auth, getUserMe);
+userRouter.get('/:userId', auth, celebrate({
+  params: Joi.object().keys({
+    userId: Joi.string().alphanum(),
+  }),
+}), getUser);
+userRouter.patch('/me', auth, celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30).required(),
     about: Joi.string().min(2).max(30).required(),
   }),
 }), updateUser);
-userRouter.patch('/users/me/avatar', auth, celebrate({
+userRouter.patch('/me/avatar', auth, celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().regex(/(http|ftp|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\/~+#-]*[\w@?^=%&\/~+#-])/mi).required(),
+    avatar: Joi.string().regex(linkRegex).required(),
   }),
 }), updateAvatar);
 

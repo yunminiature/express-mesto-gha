@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { linkRegex } = require('../app');
 
 const cardSchema = new mongoose.Schema({
   name: {
@@ -11,7 +12,7 @@ const cardSchema = new mongoose.Schema({
     type: String,
     required: true,
     validate: {
-      validator: (value) => /([\w+]+\:\/\/)?([\w\d-]+\.)*[\w-]+[\.\:]\w+([\/\?\=\&\#\.]?[\w-]+)*\/?/gm.test(value),
+      validator: (value) => linkRegex.test(value),
       message: 'Некорректный URL',
     },
   },
