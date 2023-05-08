@@ -27,18 +27,20 @@ const createCard = (req, res, next) => {
 };
 
 const deleteCard = (req, res, next) => {
-  Card.findOneAndDelete({ _id: req.params.cardId, owner: req.user._id })
+  Card.findOneAndDelete({ _id: req.params.cardId })
     .orFail(() => {
       next(new NotFoundError('Card not found'));
     })
     .then((card) => {
-      res.send({ data: card });
+      if (card.owner === req.params.cardId) {
+        res.send({ data: card });
+      } else {
+        res.status(403).send({ message: 'Forbidden' });
+      }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new DataError());
-      } else if (err.message === 'Not found') {
-        next(new NotFoundError('Card not found'));
       } else {
         next(err);
       }
@@ -60,8 +62,6 @@ const likeCard = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new DataError());
-      } else if (err.message === 'Not found') {
-        next(new NotFoundError('Card not found'));
       } else {
         next(err);
       }
@@ -83,8 +83,6 @@ const dislikeCard = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new DataError());
-      } else if (err.message === 'Not found') {
-        next(new NotFoundError('Card not found'));
       } else {
         next(err);
       }

@@ -26,8 +26,6 @@ const getUser = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new DataError());
-      } else if (err.message === 'Not found') {
-        next(new NotFoundError('User not found'));
       } else {
         next(err);
       }
@@ -43,11 +41,7 @@ const getUserMe = (req, res, next) => {
       res.send({ data: user });
     })
     .catch((err) => {
-      if (err.message === 'Not found') {
-        next(new NotFoundError('User not found'));
-      } else {
-        next(err);
-      }
+      next(err);
     });
 };
 
@@ -101,8 +95,8 @@ const updateUser = (req, res, next) => {
     })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      if (err.message === 'Not found') {
-        next(new NotFoundError('User not found'));
+      if (err.name === 'ValidationError') {
+        next(new DataError());
       } else {
         next(err);
       }
@@ -124,8 +118,8 @@ const updateAvatar = (req, res, next) => {
     })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      if (err.message === 'Not found') {
-        next(new NotFoundError('User not found'));
+      if (err.name === 'ValidationError') {
+        next(new DataError());
       } else {
         next(err);
       }
