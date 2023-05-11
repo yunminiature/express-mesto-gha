@@ -73,7 +73,9 @@ const createUser = (req, res, next) => {
       if (err.name === 'ValidationError') {
         next(new DataError());
       } else if (err.code === 11000) {
-        res.status(409).send({ message: err.message });
+        const e = new Error(err.message);
+        e.statusCode = 409;
+        next(e);
       } else {
         next(err);
       }

@@ -35,7 +35,9 @@ const deleteCard = (req, res, next) => {
       if (card.owner === req.params.cardId) {
         res.send({ data: card });
       } else {
-        res.status(403).send({ message: 'Forbidden' });
+        const err = new Error('Forbidden');
+        err.statusCode = 403;
+        next(err);
       }
     })
     .catch((err) => {

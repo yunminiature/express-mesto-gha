@@ -2,6 +2,7 @@ const express = require('express');
 const helmet = require('helmet');
 const mongoose = require('mongoose');
 const { celebrate, Joi, errors } = require('celebrate');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 const app = express();
 const { PORT = 3000 } = process.env;
@@ -16,6 +17,7 @@ mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
 
 app.use(helmet());
 app.use(express.json());
+app.use(requestLogger);
 
 app.post('/signup', celebrate({
   body: Joi.object().keys({
@@ -38,6 +40,8 @@ app.use('/cards', cardRouter);
 app.use('*', (req, res, next) => {
   next(new NotFoundError());
 });
+
+app.use(errorLogger);
 app.use(errors());
 app.use((err, req, res) => {
   const { statusCode = 500, message } = err;
